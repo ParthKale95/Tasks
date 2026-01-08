@@ -22,7 +22,30 @@ class RAGPipeline:
     def query(self, query: str, top_k=5):
         query_embedding = self.embedder.embed_query(query)
         results = self.store.similarity_search(query_embedding, top_k)
+
+        documents = results["documents"][0]
+        distances = results["distances"][0]
+
+        formatted_results = []
+
+        print("\n🔍 Query:", query)
+        print("=" * 50)
+
+        for i, (doc, dist) in enumerate(zip(documents, distances)):
+            similarity = 1 - dist  # cosine similarity
+            formatted_results.append({
+                "chunk": doc,
+                "cosine_similarity": similarity
+            })
+
+            # 🔹 PRINT IN TERMINAL
+            print(f"\nResult {i + 1}")
+            print(f"Cosine Similarity: {similarity:.4f}")
+            print("Chunk:")
+            print(doc)
+            print("-" * 50)
+
         return {
-            "query_embedding": query_embedding,
-            "results": results
+            "query": query,
+            "results": formatted_results
         }

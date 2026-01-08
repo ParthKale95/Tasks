@@ -13,7 +13,8 @@ class VectorStore:
             )
         )
         self.collection = self.client.get_or_create_collection(
-            name=COLLECTION_NAME
+            name=COLLECTION_NAME,
+            metadata={"hnsw:space": "cosine"}
         )
 
     def add_documents(self, texts: List[str], embeddings: List[List[float]]):
@@ -27,7 +28,8 @@ class VectorStore:
     def similarity_search(self, query_embedding, top_k=5):
         results = self.collection.query(
             query_embeddings=[query_embedding],
-            n_results=top_k
+            n_results=top_k,
+            include=["documents", "distances"]
         )
         return results
 
